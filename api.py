@@ -20,24 +20,25 @@ class MetaInfo(Resource):
         return self.meta_info(db, table)
 
     def meta_info(self, db, table):
-        conn = MySQLdb.connect(host="?", user="?", passwd="?", db="?")
+        conn = MySQLdb.connect(host="hive.db.51fanli.it", user="hive", passwd="hive@51fanli.com", db="hive")
         cursor = conn.cursor()
 
-        cursor.excute("select DB_ID from dbs where name = '%s'" % db)
+        cursor.execute("select DB_ID from dbs where name = '%s'" % db)
         db_id = cursor.fetchall()[0][0]
 
-        cursor.excute("select SD_ID, TBL_ID from TBLS where TBL_NAME = '%s' and DB_ID = %d" % (table, db_id))
-        sd_id = cursor.fetchall()[0][0]
-        tbl_id = cursor.fetchall()[0][1]
+        cursor.execute("select SD_ID, TBL_ID from TBLS where TBL_NAME = '%s' and DB_ID = %d" % (table, db_id))
+        r = cursor.fetchall()
+        sd_id = r[0][0]
+        tbl_id = r[0][1]
 
-        cursor.excute("select CD_ID from sds where sd_id = %d" % sd_id)
+        cursor.execute("select CD_ID from sds where sd_id = %d" % sd_id)
         cd_id = cursor.fetchall()[0][0]
 
-        cursor.excute("select COLUMN_NAME, TYPE_NAME, COMMENT from columns_v2 where cd_id = %d" % cd_id)
+        cursor.execute("select COLUMN_NAME, TYPE_NAME, COMMENT from columns_v2 where cd_id = %d" % cd_id)
         column_results = cursor.fetchall()
         columns = self.results_2_dict_arr(column_results)
 
-        cursor.excute("select PKEY_NAME, PKEY_TYPE, PKEY_COMMENT from partition_keys where TBL_ID = %d" % tbl_id)
+        cursor.execute("select PKEY_NAME, PKEY_TYPE, PKEY_COMMENT from partition_keys where TBL_ID = %d" % tbl_id)
         partition_results = cursor.fetchall()
         partitions = self.results_2_dict_arr(partition_results)
 
