@@ -9,9 +9,6 @@ import simplejson as json
 app = Flask(__name__)
 api = Api(app)
 
-conn = MySQLdb.connect(host="??", user="??", passwd="??", db="??")
-cursor = conn.cursor()
-
 
 class HelloWorld(Resource):
     def get(self):
@@ -23,6 +20,9 @@ class MetaInfo(Resource):
         return self.meta_info(db, table)
 
     def meta_info(self, db, table):
+        conn = MySQLdb.connect(host="?", user="?", passwd="?", db="?")
+        cursor = conn.cursor()
+
         cursor.excute("select DB_ID from dbs where name = '%s'" % db)
         db_id = cursor.fetchall()[0][0]
 
@@ -41,8 +41,10 @@ class MetaInfo(Resource):
         partition_results = cursor.fetchall()
         partitions = self.results_2_dict_arr(partition_results)
 
-        results = {"database": db, "table": table, "columns": columns, "partitions": partitions}
+        cursor.close()
+        conn.close()
 
+        results = {"database": db, "table": table, "columns": columns, "partitions": partitions}
         return json.dumps(results)
 
     def results_2_dict_arr(self, results):
