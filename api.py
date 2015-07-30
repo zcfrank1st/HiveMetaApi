@@ -19,7 +19,7 @@ class MetaInfo(Resource):
         return self.meta_info(db, table)
 
     def meta_info(self, db, table):
-        conn = MySQLdb.connect(host="hive.db.51fanli.it", user="hive", passwd="hive@51fanli.com", db="hive")
+        conn = MySQLdb.connect(host="hive.db.51fanli.it", user="hive", passwd="hive@51fanli.com", db="hive", charset='utf8')
         cursor = conn.cursor()
 
         cursor.execute("select DB_ID, DB_LOCATION_URI from dbs where name = '%s'" % db)
