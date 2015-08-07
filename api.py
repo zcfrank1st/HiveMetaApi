@@ -8,6 +8,12 @@ import MySQLdb
 app = Flask(__name__)
 api = Api(app)
 
+HOST = "hive.db.51fanli.it"
+USER = "hive"
+PASSWD = "hive@51fanli.com"
+DB = "hive"
+CHARSET = "utf8"
+
 
 class HelloWorld(Resource):
     def get(self):
@@ -19,7 +25,7 @@ class MetaInfo(Resource):
         return self.meta_info(db, table)
 
     def meta_info(self, db, table):
-        conn = MySQLdb.connect(host="hive.db.51fanli.it", user="hive", passwd="hive@51fanli.com", db="hive", charset='utf8')
+        conn = MySQLdb.connect(host=HOST, user=USER, passwd=PASSWD, db=DB, charset=CHARSET)
         cursor = conn.cursor()
 
         cursor.execute("select DB_ID, DB_LOCATION_URI from dbs where name = '%s'" % db)
@@ -57,8 +63,45 @@ class MetaInfo(Resource):
         return arr
 
 
+class Tables(Resource):
+    def get(self, db):
+        return self.tables(db)
+
+    def tables(self, db):
+        conn = MySQLdb.connect(host=HOST, user=USER, passwd=PASSWD, db=DB, charset=CHARSET)
+        cursor = conn.cursor()
+
+        cursor.execute("select DB_ID from dbs where name = '%s'" % db)
+        db_results = cursor.fetchall()
+        db_id = db_results[0][0]
+
+        cursor.execute("select TBL_ID, TBL_NAME from TBLS where DB_ID = %d" % (db_id))
+        r = cursor.fetchall()
+
+        results = []
+        for e in r:
+            results.append({'table': e[1]})
+
+        return results
+
+
+class DBHdfsPath(Resource):
+    def get(self, db):
+        return self.db_hdfs_path(db)
+
+    def db_hdfs_path(self, db):
+        conn = MySQLdb.connect(host=HOST, user=USER, passwd=PASSWD, db=DB, charset=CHARSET)
+        cursor = conn.cursor()
+
+        cursor.execute("select DB_ID, DB_LOCATION_URI from dbs where name = '%s'" % db)
+        db_results = cursor.fetchall()
+        db_location = db_results[0][1]
+        return {'dbLocation': db_location}
+
 api.add_resource(HelloWorld, '/')
 api.add_resource(MetaInfo, '/<string:db>/<string:table>')
+api.add_resource(Tables, '/tables/<string:db>')
+api.add_resource(DBHdfsPath, '/dbpath/<string:db>')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3434, debug=True)
