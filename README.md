@@ -5,51 +5,50 @@ HiveMeta (restful)
 RUN: `python api.py `
 
 
-[GET] http://ip:3434/[dbname]/[tablename]
+`[GET] http://ip:3434/[dbname]/[tablename]`
 
 return
 
-hive meta json <br>
+	{
+		"columns": [
+			{
+			"comment": null,
+			"index": 0,
+			"name": "id",
+			"type": "string"
+			},
+			{
+			"comment": null,
+			"index": 1,
+			"name": "order_no",
+			"type": "string"
+			},
+		],
+		"database": "load",
+		"partitions": [
+			{
+			"comment": null,
+			"index": 0,
+			"name": "ids",
+			"type": "string"
+			}
+		],
+		"source":"hdfs://namenode171:54310/user/hive/bi_warehouse/LOAD.db/fanli_slice_man_vi_tb_pay_orders_init",
+		"table":"fanli_slice_man_vi_tb_pay_orders_init"
+	}	
+`[GET] http://ip:3434/tables/[dbname]`
+
+return
+
+	[{"table":"fanli_slice_man_vi_tb_pay_orders_init"},{"table":""}]
+	
+`[GET] http://ip:3434/dbpath/[dbname]`
+
+return
 
 	{
-    	"database" : "",
-    	"table" : "",
-    	"columns" : [
-    	{
-        	"name": "",
-        	"type": "",
-        	"comment": ""
-    	},{
-        	"name": "",
-        	"type": "",
-        	"comment": ""
-    	},{
-        	"name": "",
-        	"type": "",
-        	"comment": ""
-    	}],
-    	"partitions": [{
-        	"name": "",
-        	"type": "",
-        	"comment": ""
-    	},{
-        	"name": "",
-        	"type": "",
-        	"comment": ""
-    	}]
+	"dbLocation":"hdfs://namenode171:54310/user/hive/bi_warehouse/LOAD.db"
 	}
+
 P.S.
-	
-hive version 0.13
-
-gain hive meta table info : <br>
-
-	select DB_ID from dbs where name = ?
-
-	select SD_ID, TBL_ID from TBLS where TBL_NAME = ? and DB_ID = ?
-
-	select CD_ID from sds where sd_id = ?
-
-	select COLUMN_NAME, TYPE_NAME, COMMENT from columns_v2 where cd_id = ?
-
-	select PKEY_NAME, PKEY_TYPE, PKEY_COMMENT from partition_keys where TBL_ID = ?
+fit for hive 0.13
